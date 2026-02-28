@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedAI - Medical Instructions App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-container {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .app-title {
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .app-subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.3rem;
+            margin-bottom: 3rem;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .role-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 300px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+        .role-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            text-decoration: none;
+        }
+        .role-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+        .admin-card .role-icon {
+            color: #667eea;
+        }
+        .patient-card .role-icon {
+            color: #764ba2;
+        }
+        .role-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .role-description {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        .footer {
+            margin-top: 50px;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="app-title">
+            <i class="fas fa-pills"></i> MedAI
+        </div>
+        <div class="app-subtitle">
+            Safe medication guidance at your fingertips
+        </div>
+        
+        <div class="button-container">
+            <a href="/admin" class="role-card admin-card">
+                <div class="role-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="role-title">Admin</div>
+                <div class="role-description">
+                    Manage medication database, add new medicines, and update instructions
+                </div>
+            </a>
+            
+            <a href="/patient" class="role-card patient-card">
+                <div class="role-icon">
+                    <i class="fas fa-user-injured"></i>
+                </div>
+                <div class="role-title">Patient</div>
+                <div class="role-description">
+                    Upload medicine image and get instant instructions and dosage information
+                </div>
+            </a>
+        </div>
+        
+        <div class="footer">
+            <i class="fas fa-shield-alt"></i> Secure • Accurate • Reliable
+        </div>
+    </div>
+</body>
+</html>

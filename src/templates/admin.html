@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - MedAI Drug Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .admin-container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 20px auto;
+            max-width: 1200px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .admin-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .admin-header h1 {
+            color: #667eea;
+            font-weight: bold;
+        }
+        .home-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            z-index: 1000;
+        }
+        .home-link:hover {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+        }
+        .section-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #dee2e6;
+        }
+        .section-title {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            background: white;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f8f9fa;
+        }
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .btn-primary-custom:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+        .btn-danger-custom {
+            background: #dc3545;
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        .btn-warning-custom {
+            background: #ffc107;
+            border: none;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        .medicine-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table thead th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+        .instructions-cell {
+            max-width: 400px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .alert-custom {
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        textarea.form-control {
+            min-height: 100px;
+        }
+        .action-buttons {
+            white-space: nowrap;
+        }
+        .edit-form {
+            display: none;
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .stats-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="home-link">
+        <i class="fas fa-home"></i>
+    </a>
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1><i class="fas fa-user-shield"></i> Admin Panel</h1>
+            <p class="text-muted">Manage drug information database</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-custom alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if message %}
+            <div class="alert alert-success alert-custom alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
+
+        <!-- Upload DOCX Section -->
+        <div class="section-card">
+            <h3 class="section-title"><i class="fas fa-file-upload"></i> Import Drug Information from DOCX</h3>
+            <form action="/admin/import-docx" method="POST" enctype="multipart/form-data">
+                <div class="upload-area">
+                    <i class="fas fa-file-word" style="font-size: 3rem; color: #667eea; margin-bottom: 15px;"></i>
+                    <p class="mb-3">Upload <strong>Drug_Information.docx</strong> file</p>
+                    <input type="file" name="file" accept=".docx" class="form-control-file" required style="display: inline-block; width: auto;">
+                    <p class="text-muted mt-2 small">The DOCX file should contain a table with two columns: Drug name and Instructions</p>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary-custom">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload & Import
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Add New Medicine Section -->
+        <div class="section-card">
+            <h3 class="section-title"><i class="fas fa-plus-circle"></i> Register New Medicine</h3>
+            <form action="/admin/add" method="POST">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="drug"><strong>Drug Name</strong></label>
+                        <input type="text" class="form-control" id="drug" name="drug" placeholder="e.g., Aspirin" required>
+                    </div>
+                    <div class="form-group col-md-8">
+                        <label for="instructions"><strong>Instructions</strong></label>
+                        <textarea class="form-control" id="instructions" name="instructions" placeholder="Enter usage instructions, dosage, warnings, etc." required></textarea>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary-custom">
+                        <i class="fas fa-save"></i> Add Medicine
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Medicine Database Section -->
+        <div class="section-card">
+            <h3 class="section-title">
+                <i class="fas fa-database"></i> Medicine Database
+                <span class="stats-badge">{{ medicines|length }} Total</span>
+            </h3>
+            
+            {% if medicines %}
+                <div class="table-responsive medicine-table">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">#</th>
+                                <th style="width: 25%;">Drug</th>
+                                <th style="width: 55%;">Instructions</th>
+                                <th style="width: 15%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for medicine in medicines %}
+                            <tr id="row-{{ medicine[0] }}">
+                                <td>{{ loop.index }}</td>
+                                <td><strong>{{ medicine[1] }}</strong></td>
+                                <td class="instructions-cell">{{ medicine[2] }}</td>
+                                <td class="action-buttons">
+                                    <button class="btn btn-warning-custom btn-sm" onclick="toggleEdit({{ medicine[0] }})">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="btn btn-danger-custom btn-sm" onclick="deleteMedicine({{ medicine[0] }}, '{{ medicine[1] }}')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr id="edit-{{ medicine[0] }}" style="display: none;">
+                                <td colspan="4">
+                                    <form action="/admin/update" method="POST" class="edit-form" style="display: block;">
+                                        <input type="hidden" name="id" value="{{ medicine[0] }}">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label><strong>Drug Name</strong></label>
+                                                <input type="text" class="form-control" name="drug" value="{{ medicine[1] }}" required>
+                                            </div>
+                                            <div class="form-group col-md-8">
+                                                <label><strong>Instructions</strong></label>
+                                                <textarea class="form-control" name="instructions" required>{{ medicine[2] }}</textarea>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="fas fa-check"></i> Save Changes
+                                        </button>
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEdit({{ medicine[0] }})">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle"></i> No medicines in database yet. Upload a DOCX file or add medicines manually.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleEdit(id) {
+            const editRow = document.getElementById('edit-' + id);
+            if (editRow.style.display === 'none') {
+                editRow.style.display = 'table-row';
+            } else {
+                editRow.style.display = 'none';
+            }
+        }
+
+        function deleteMedicine(id, name) {
+            if (confirm(`Are you sure you want to delete "${name}"?`)) {
+                fetch('/admin/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'id=' + id
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('row-' + id).remove();
+                        document.getElementById('edit-' + id).remove();
+                        alert('Medicine deleted successfully');
+                        location.reload();
+                    } else {
+                        alert('Error deleting medicine: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('Error: ' + error);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

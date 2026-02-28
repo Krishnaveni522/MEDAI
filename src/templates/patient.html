@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient - Upload Medicine Image</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .patient-container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .patient-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .patient-header h1 {
+            color: #764ba2;
+            font-weight: bold;
+        }
+        .upload-area {
+            border: 3px dashed #764ba2;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #f8f9fa;
+        }
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #e9ecef;
+        }
+        .upload-area.drag-over {
+            border-color: #667eea;
+            background: #d4d8f7;
+        }
+        .upload-icon {
+            font-size: 4rem;
+            color: #764ba2;
+            margin-bottom: 20px;
+        }
+        .file-input {
+            display: none;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            margin: 20px auto;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-upload {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 40px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+        .btn-upload:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+        .btn-upload:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .loading-spinner {
+            display: none;
+            margin: 20px auto;
+        }
+        .home-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+        }
+        .home-link:hover {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+        }
+        .tips-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .tips-box h5 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+        .tips-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .search-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .search-section h5 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #ffc107;
+            border-radius: 25px;
+            font-size: 1rem;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #ff9800;
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        }
+        .btn-search {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .btn-search:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #ddd;
+            z-index: 0;
+        }
+        .divider span {
+            background: white;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+            color: #666;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="home-link"><i class="fas fa-home"></i></a>
+    
+    <div class="patient-container">
+        <div class="patient-header">
+            <h1><i class="fas fa-user-injured"></i> Patient Portal</h1>
+            <p class="text-muted">Search by text or upload a medicine image</p>
+        </div>
+
+        <!-- Text Search Section -->
+        <div class="search-section">
+            <h5><i class="fas fa-keyboard"></i> Search by Medicine Name</h5>
+            <form id="searchForm" action="/patient/search" method="post">
+                <div class="search-input-group">
+                    <input type="text" name="search_text" id="searchInput" class="search-input" placeholder="Type medicine name (e.g., Tacrolimus, Aspirin, Paracetamol...)" required>
+                    <button type="submit" class="btn btn-search">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                <small class="text-muted d-block mt-2">
+                    <i class="fas fa-lightbulb"></i> Tip: Type any part of the medicine name for instant results
+                </small>
+            </form>
+        </div>
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <!-- Image Upload Section -->
+        <div class="tips-box">
+            <h5><i class="fas fa-info-circle"></i> Tips for Image Upload:</h5>
+            <ul>
+                <li>Ensure the medicine label is clearly visible</li>
+                <li>Use good lighting - avoid shadows</li>
+                <li>Image can be in any orientation - our AI will auto-correct</li>
+                <li>Supported formats: JPG, PNG, JPEG</li>
+                <li>Keep the camera steady and close enough to read the text</li>
+            </ul>
+        </div>
+
+        <form id="uploadForm" action="/patient/upload" method="post" enctype="multipart/form-data">
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <div id="uploadPrompt">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h4>Click to upload or drag & drop</h4>
+                    <p class="text-muted">Upload a photo of your medicine label</p>
+                    <p class="text-muted"><small>JPG, PNG, JPEG (Max 10MB)</small></p>
+                </div>
+                <div id="imagePreviewContainer" style="display: none;">
+                    <img id="imagePreview" class="image-preview" alt="Preview">
+                    <button type="button" class="btn btn-secondary mt-3" onclick="clearImage(); event.stopPropagation();">
+                        <i class="fas fa-times"></i> Clear Image
+                    </button>
+                </div>
+            </div>
+            
+            <input type="file" id="fileInput" name="file" class="file-input" accept="image/*" required>
+            
+            <div class="text-center mt-4">
+                <button type="submit" id="submitBtn" class="btn btn-upload" disabled>
+                    <i class="fas fa-search"></i> Analyze Medicine
+                </button>
+            </div>
+
+            <div class="loading-spinner text-center" id="loadingSpinner">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="sr-only">Processing...</span>
+                </div>
+                <p class="mt-2">Analyzing your medicine image...</p>
+                <p class="text-muted"><small>This may take 10-30 seconds</small></p>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const uploadPrompt = document.getElementById('uploadPrompt');
+        const submitBtn = document.getElementById('submitBtn');
+        const uploadForm = document.getElementById('uploadForm');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        // File input change event
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                
+                // Validate file type
+                if (!file.type.match('image.*')) {
+                    alert('Please upload an image file (JPG, PNG, JPEG)');
+                    return;
+                }
+                
+                // Validate file size (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size must be less than 10MB');
+                    return;
+                }
+                
+                // Preview image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    uploadPrompt.style.display = 'none';
+                    imagePreviewContainer.style.display = 'block';
+                    submitBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Clear image
+        function clearImage() {
+            fileInput.value = '';
+            uploadPrompt.style.display = 'block';
+            imagePreviewContainer.style.display = 'none';
+            submitBtn.disabled = true;
+        }
+
+        // Form submission
+        uploadForm.addEventListener('submit', function(e) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            loadingSpinner.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
